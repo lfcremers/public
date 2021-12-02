@@ -1,4 +1,4 @@
-import numpy as np
+#import numpy as np
 import random
 import time
 import sys
@@ -42,7 +42,18 @@ class PlayerAI(BaseAI):
         You may adjust the input variables as you wish (though it is not necessary). Output has to be (x,y) coordinates.
         
         """
-        pass
+        #implement improved score heuristic: ish
+        current_options=grid.get_neighbors(self.pos, only_available = True)
+        adv_options=grid.get_neighbors(grid.find(2), only_available=True)
+        options={}
+        ish=len(current_options)-len(adv_options)
+        ish_coords=None
+        for option in current_options:
+            if (len(grid.get_neighbors(option,only_available=True))-len(adv_options))>ish:
+                ish=len(grid.get_neighbors(option,only_available=True))-len(adv_options)
+                ish_coords=option
+
+        return ish_coords
 
     def getTrap(self, grid : Grid) -> tuple:
         """ 
@@ -58,7 +69,8 @@ class PlayerAI(BaseAI):
         You may adjust the input variables as you wish (though it is not necessary). Output has to be (x,y) coordinates.
         
         """
-        pass
+        #simplest return
+        return grid.getAvailableCells()[0]
         
 
     
