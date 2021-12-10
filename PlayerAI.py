@@ -1,4 +1,4 @@
-#import numpy as np
+import numpy as np
 import random
 import time
 import sys
@@ -8,6 +8,21 @@ from Grid import Grid
 
 # TO BE IMPLEMENTED
 # 
+class Node():
+
+    def __init__(self,util,grid,parent=None):
+
+        self.util=util
+        self.grid=grid
+        self.children=[]
+        self.parent=parent
+        self.depth=0
+        if parent==None:
+            self.depth=1
+        else:
+            self.depth=parent.depth+1
+
+
 class PlayerAI(BaseAI):
 
     def __init__(self) -> None:
@@ -15,18 +30,32 @@ class PlayerAI(BaseAI):
         super().__init__()
         self.pos = None
         self.player_num = None
+        
+        
     
     def getPosition(self):
         return self.pos
 
     def setPosition(self, new_position):
         self.pos = new_position 
+        self.root=self.pos
+        #should initiate the tree here?
 
     def getPlayerNum(self):
         return self.player_num
 
     def setPlayerNum(self, num):
         self.player_num = num
+
+    def ish(self,current_options, grid):
+        best_option=None
+        num_options=0
+        for option in current_options:
+            if len(grid.get_neighbors(option,only_available=True))>num_options:
+                best_option=option
+                num_options=len(grid.get_neighbors(option,only_available=True))
+
+        return best_option
 
     def getMove(self, grid: Grid) -> tuple:
         """ 
@@ -45,15 +74,9 @@ class PlayerAI(BaseAI):
         #implement improved score heuristic: ish
         current_options=grid.get_neighbors(self.pos, only_available = True)
         adv_options=grid.get_neighbors(grid.find(2), only_available=True)
-        options={}
-        ish=len(current_options)-len(adv_options)
-        ish_coords=None
-        for option in current_options:
-            if (len(grid.get_neighbors(option,only_available=True))-len(adv_options))>ish:
-                ish=len(grid.get_neighbors(option,only_available=True))-len(adv_options)
-                ish_coords=option
-
-        return ish_coords
+            
+        best_option=self.ish(current_options,grid)
+        return best_option
 
     def getTrap(self, grid : Grid) -> tuple:
         """ 
@@ -70,7 +93,9 @@ class PlayerAI(BaseAI):
         
         """
         #simplest return
-        return grid.getAvailableCells()[0]
+
+        #return coordinates next to opponent
+        return grid.get_neighbors(grid.find(2),only_available=True)[0]
         
 
     

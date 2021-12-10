@@ -1,5 +1,5 @@
 from copy import deepcopy
-#import numpy as np
+import numpy as np
 
 
 class Grid():
